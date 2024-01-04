@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>测试文章</title>
+    <url>/2024/01/01/%E6%B5%8B%E8%AF%95%E6%96%87%E6%A1%A3/</url>
+    <content><![CDATA[<h1 id="这是个测试文章"><a class="markdownIt-Anchor" href="#这是个测试文章"></a> 这是个测试文章</h1>
+<p>大家可以自由评论。。。</p>
+<hr />
+]]></content>
+  </entry>
+  <entry>
     <title>个人写作格式</title>
     <url>/2024/01/02/%E4%B8%AA%E4%BA%BA%E5%86%99%E4%BD%9C%E6%A0%BC%E5%BC%8F/</url>
     <content><![CDATA[<div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
@@ -17,11 +25,583 @@
 <script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">]]></content>
   </entry>
   <entry>
-    <title>测试文章</title>
-    <url>/2024/01/01/%E6%B5%8B%E8%AF%95%E6%96%87%E6%A1%A3/</url>
-    <content><![CDATA[<h1 id="这是个测试文章"><a class="markdownIt-Anchor" href="#这是个测试文章"></a> 这是个测试文章</h1>
-<p>大家可以自由评论。。。</p>
-<hr />
+    <title>Java实现Excel导入导出</title>
+    <url>/2024/01/04/Java%E5%AF%BC%E5%85%A5%E5%AF%BC%E5%87%BAExcel/</url>
+    <content><![CDATA[<h1 id="java实现excel导入导出"><a class="markdownIt-Anchor" href="#java实现excel导入导出"></a> Java实现Excel导入导出</h1>
+<h2 id="1功能测试"><a class="markdownIt-Anchor" href="#1功能测试"></a> 1.功能测试</h2>
+<h3 id="11测试准备"><a class="markdownIt-Anchor" href="#11测试准备"></a> 1.1测试准备</h3>
+<p>在做测试之前，我们需要将以下四个文件拷贝到工程中</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_11-51-29.png"
+                        alt="" 
+                 ></p>
+<h2 id="12数据导入"><a class="markdownIt-Anchor" href="#12数据导入"></a> 1.2数据导入</h2>
+<h3 id="121导入解析为json"><a class="markdownIt-Anchor" href="#121导入解析为json"></a> 1.2.1导入解析为JSON</h3>
+<p>比如，我们有下面一个表格：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_11-53-44.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">@PostMapping(&quot;/import&quot;)</span><br><span class="line">public JSONArray importUser(@RequestPart(&quot;file&quot;)MultipartFile file) throws Exception &#123;</span><br><span class="line">    JSONArray array = ExcelUtils.readMultipartFile(file);</span><br><span class="line">    System.out.println(&quot;导入数据为:&quot; + array);</span><br><span class="line">    return array;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_11-54-26.png"
+                        alt="" 
+                 ></p>
+<h3 id="122导入解析为对象基础"><a class="markdownIt-Anchor" href="#122导入解析为对象基础"></a> 1.2.2导入解析为对象(基础)</h3>
+<p>首先，你需要创建一个与导入表格对应的Java实体类对象，并打上对应的Excel解析的导入注解，@ExcellImport注解的value则为表头名称。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_11-56-38.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">@PostMapping(&quot;/import&quot;)</span><br><span class="line">public void importUser(@RequestPart(&quot;file&quot;)MultipartFile file) throws Exception &#123;</span><br><span class="line">    List&lt;User&gt; users = ExcelUtils.readMultipartFile(file, User.class);</span><br><span class="line">    for (User user : users) &#123;</span><br><span class="line">        System.out.println(user.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_11-57-36.png"
+                        alt="" 
+                 ></p>
+<h3 id="123导入解析对象字段自动映射"><a class="markdownIt-Anchor" href="#123导入解析对象字段自动映射"></a> 1.2.3导入解析对象(字段自动映射)</h3>
+<p>对于有的枚举数据，通常我们导入的时候，表格中的数据是值，而在数据保存时，往往用的是键，比如：我们用sex=1可以表示为男，sex=2表示为女，那么我们通过配置也可以达到导入时，数据的自动映射。</p>
+<p>那么，我们只需要将Java实体中的对象sex字段的类型改为对应数字类型Integer，然后再注解中配置好kv属性（属性格式为：键1-值1；键2-值2；键3；…）</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_12-42-53.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">@PostMapping(&quot;/import&quot;)</span><br><span class="line">public void importUser(@RequestPart(&quot;file&quot;)MultipartFile file) throws Exception &#123;</span><br><span class="line">    List&lt;User&gt; users = ExcelUtils.readMultipartFile(file, User.class);</span><br><span class="line">    for (User user : users) &#123;</span><br><span class="line">        System.out.println(user.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试效果：可以看到已经自动映射成功了。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_12-44-01.png"
+                        alt="" 
+                 ></p>
+<h3 id="124导入解析为对象获取行号"><a class="markdownIt-Anchor" href="#124导入解析为对象获取行号"></a> 1.2.4导入解析为对象（获取行号）</h3>
+<p>我们在做页面数据导入时，有时候可能需要获取行号，好追踪导入的数据。</p>
+<p>那么，我们只需要在对应的实体中加入一个int类型的rowNum字段即可。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_12-45-34.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">@PostMapping(&quot;/import&quot;)</span><br><span class="line">public void importUser(@RequestPart(&quot;file&quot;)MultipartFile file) throws Exception &#123;</span><br><span class="line">    List&lt;User&gt; users = ExcelUtils.readMultipartFile(file, User.class);</span><br><span class="line">    for (User user : users) &#123;</span><br><span class="line">        System.out.println(user.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_12-46-08.png"
+                        alt="" 
+                 ></p>
+<h3 id="125导入解析为对象获取原始数据"><a class="markdownIt-Anchor" href="#125导入解析为对象获取原始数据"></a> 1.2.5导入解析为对象（获取原始数据）</h3>
+<p>在做页面数据导入的时候，如果某行存在错误，一般我们会将原始的数据拿出来分析，为什么会造成数据错误。那么，我们在实体类中，增加一个String类型的rowData字段即可。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_12-48-45.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">@PostMapping(&quot;/import&quot;)</span><br><span class="line">public void importUser(@RequestPart(&quot;file&quot;)MultipartFile file) throws Exception &#123;</span><br><span class="line">    List&lt;User&gt; users = ExcelUtils.readMultipartFile(file, User.class);</span><br><span class="line">    for (User user : users) &#123;</span><br><span class="line">        System.out.println(user.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_12-50-23.png"
+                        alt="" 
+                 ></p>
+<h3 id="126导入解析为对象获取错误提示"><a class="markdownIt-Anchor" href="#126导入解析为对象获取错误提示"></a> 1.2.6导入解析为对象（获取错误提示）</h3>
+<p>当我们在导入数据的时候，如果某行数据存在，字段类型不正确，长度超多最大限制(详见1.2.7)，必填字段验证（1.2.8），数据唯一性验证（1.2.9）等一些错误时候，我们可以往对象中添加一个String类型的rowTips字段，则可以直接拿到对应的错误信息。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_12-53-47.png"
+                        alt="" 
+                 ></p>
+<p>比如，我们将表格中赵子龙的性别改为F（F并不是映射数据），将大乔的性别改为二十八（不能转换为Integer类型数据）。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_12-55-34.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">@PostMapping(&quot;/import&quot;)</span><br><span class="line">public void importUser(@RequestPart(&quot;file&quot;)MultipartFile file) throws Exception &#123;</span><br><span class="line">    List&lt;User&gt; users = ExcelUtils.readMultipartFile(file, User.class);</span><br><span class="line">    for (User user : users) &#123;</span><br><span class="line">        System.out.println(user.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试效果：可以看到，我们可以通过rowTips直接拿到对应的错误数据提示。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_12-56-37.png"
+                        alt="" 
+                 ></p>
+<h3 id="127导入解析为对象限制字段长度"><a class="markdownIt-Anchor" href="#127导入解析为对象限制字段长度"></a> 1.2.7导入解析为对象（限制字段长度）</h3>
+<p>比如，我们手机通常为11位长度，那么不妨限制电话的最大长度位数为11位。</p>
+<p>对应的做法，就是在@ExcellImport注解中，设置maxLength = 11即可。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_12-58-48.png"
+                        alt="" 
+                 ></p>
+<p>比如，我们将诸葛亮孔明的电话长度设置为超过11位数的字符串。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-00-11.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">@PostMapping(&quot;/import&quot;)</span><br><span class="line">public void importUser(@RequestPart(&quot;file&quot;)MultipartFile file) throws Exception &#123;</span><br><span class="line">    List&lt;User&gt; users = ExcelUtils.readMultipartFile(file, User.class);</span><br><span class="line">    for (User user : users) &#123;</span><br><span class="line">        System.out.println(user.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-00-42.png"
+                        alt="" 
+                 ></p>
+<h3 id="128导入为对象必填字段验证"><a class="markdownIt-Anchor" href="#128导入为对象必填字段验证"></a> 1.2.8导入为对象（必填字段验证）</h3>
+<p>我们在做数据导入的时候，往往还会有一些必填字段，比如用户的名称，电话。</p>
+<p>那么，我们只需要在@ExcelImport注解属性中，加上required = true 即可。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-02-49.png"
+                        alt="" 
+                 ></p>
+<p>我们将诸葛孔明的电话，以及第四行的姓名去掉，进行测试。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-06-06.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">@PostMapping(&quot;/import&quot;)</span><br><span class="line">public void importUser(@RequestPart(&quot;file&quot;)MultipartFile file) throws Exception &#123;</span><br><span class="line">    List&lt;User&gt; users = ExcelUtils.readMultipartFile(file, User.class);</span><br><span class="line">    for (User user : users) &#123;</span><br><span class="line">        System.out.println(user.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-06-44.png"
+                        alt="" 
+                 ></p>
+<h3 id="129导入解析为对象数据唯一性验证"><a class="markdownIt-Anchor" href="#129导入解析为对象数据唯一性验证"></a> 1.2.9导入解析为对象（数据唯一性验证）</h3>
+<h4 id="1单字段唯一性验证"><a class="markdownIt-Anchor" href="#1单字段唯一性验证"></a> （1）单字段唯一性验证</h4>
+<p>我们在导入数据的时候，某个字段是具有唯一性的，比如我们这里假设规定姓名不能重复，那么则可以在对应字段的@EcelImport书接上加上 unique = true 属性。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-09-58.png"
+                        alt="" 
+                 ></p>
+<p>这里我们构建2条姓名一样的数据进行测试。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-10-45.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">@PostMapping(&quot;/import&quot;)</span><br><span class="line">public void importUser(@RequestPart(&quot;file&quot;)MultipartFile file) throws Exception &#123;</span><br><span class="line">    List&lt;User&gt; users = ExcelUtils.readMultipartFile(file, User.class);</span><br><span class="line">    for (User user : users) &#123;</span><br><span class="line">        System.out.println(user.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-11-19.png"
+                        alt="" 
+                 ></p>
+<p>（2）多字段唯一性验证</p>
+<p>如果你导入的数据存在多字段唯一性性验证这种情况，只需要将每个对应字段的@ExcelImport注解属性中，都加上 unique = true 即可。</p>
+<p>比如：我们将姓名和电话两个字段进行联合唯一性验证（即不能存在有名称和电话都一样的数据，单个字段属性重复允许）。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-15-18.png"
+                        alt="" 
+                 ></p>
+<p>首先，我们将刚刚（1）的数据进行导入。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-15-45.png"
+                        alt="" 
+                 ></p>
+<p>测试效果：可以看到，虽然名称有相同，单电话不相同，所以这里并没有提示唯一性验证错误。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-16-58.png"
+                        alt="" 
+                 ></p>
+<p>现在，我们将最后一行的电话也改为和第一行一样的，于是，现在就存在了违背唯一性的两条数据。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-18-03.png"
+                        alt="" 
+                 ></p>
+<p>测试效果：可以看到，我们的联合唯一性验证生效了。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-18-48.png"
+                        alt="" 
+                 ></p>
+<h3 id="1210导入多sheet页"><a class="markdownIt-Anchor" href="#1210导入多sheet页"></a> 1.2.10导入多Sheet页</h3>
+<p>如果你的导入表格存在多个sheet页（如下图），并想解析每个sheet页的数据，那么也是可以的。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-20-03.png"
+                        alt="" 
+                 ></p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-20-13.png"
+                        alt="" 
+                 ></p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-20-22.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">@PostMapping(&quot;/import&quot;)</span><br><span class="line">public void upload(@RequestPart(&quot;file&quot;) MultipartFile file) throws Exception &#123;</span><br><span class="line">    Map&lt;String, JSONArray&gt; map = ExcelUtils.readFileManySheet(file);</span><br><span class="line">    map.forEach((key, value) -&gt; &#123;</span><br><span class="line">        System.out.println(&quot;Sheet名称：&quot; + key);</span><br><span class="line">        System.out.println(&quot;Sheet数据：&quot; + value);</span><br><span class="line">        System.out.println(&quot;----------------------&quot;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码截图：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-21-05.png"
+                        alt="" 
+                 ></p>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-21-35.png"
+                        alt="" 
+                 ></p>
+<h2 id="13数据导出"><a class="markdownIt-Anchor" href="#13数据导出"></a> 1.3数据导出</h2>
+<h3 id="131动态导出基础"><a class="markdownIt-Anchor" href="#131动态导出基础"></a> 1.3.1动态导出（基础）</h3>
+<p>这种方式十分灵活，表中的数据，完全自定义设置。</p>
+<p>Controller代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">@GetMapping(&quot;/export&quot;)</span><br><span class="line">public void export(HttpServletResponse response) &#123;</span><br><span class="line">    // 表头数据</span><br><span class="line">    List&lt;Object&gt; head = Arrays.asList(&quot;姓名&quot;,&quot;年龄&quot;,&quot;性别&quot;,&quot;头像&quot;);</span><br><span class="line">    // 用户1数据</span><br><span class="line">    List&lt;Object&gt; user1 = new ArrayList&lt;&gt;();</span><br><span class="line">    user1.add(&quot;诸葛亮&quot;);</span><br><span class="line">    user1.add(60);</span><br><span class="line">    user1.add(&quot;男&quot;);</span><br><span class="line">    user1.add(&quot;https://profile.csdnimg.cn/A/7/3/3_sunnyzyq&quot;);</span><br><span class="line">    // 用户2数据</span><br><span class="line">    List&lt;Object&gt; user2 = new ArrayList&lt;&gt;();</span><br><span class="line">    user2.add(&quot;大乔&quot;);</span><br><span class="line">    user2.add(28);</span><br><span class="line">    user2.add(&quot;女&quot;);</span><br><span class="line">    user2.add(&quot;https://profile.csdnimg.cn/6/1/9/0_m0_48717371&quot;);</span><br><span class="line">    // 将数据汇总</span><br><span class="line">    List&lt;List&lt;Object&gt;&gt; sheetDataList = new ArrayList&lt;&gt;();</span><br><span class="line">    sheetDataList.add(head);</span><br><span class="line">    sheetDataList.add(user1);</span><br><span class="line">    sheetDataList.add(user2);</span><br><span class="line">    // 导出数据</span><br><span class="line">    ExcelUtils.export(response,&quot;用户表&quot;, sheetDataList);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码截图：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-23-33.png"
+                        alt="" 
+                 ></p>
+<p>由于是get请求，我们直接在浏览器上输入请求地址即可触发下载。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-24-36.png"
+                        alt="" 
+                 ></p>
+<p>打开下载表格，我们可以看到，表中的数据和我们代码组装的顺序一致。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-25-16.png"
+                        alt="" 
+                 ></p>
+<h3 id="132动态导出导出图片"><a class="markdownIt-Anchor" href="#132动态导出导出图片"></a> 1.3.2动态导出（导出图片）</h3>
+<p>如果你的导出中，需要将对应图片链接直接显示为图片的话，那么，这里也是可以的，只需要将对应的类型转为 java.net.URL 类型即可（注意：转的时候有异常处理，为了方便演示我这里直接抛出）</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-27-42.png"
+                        alt="" 
+                 ></p>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-28-18.png"
+                        alt="" 
+                 ></p>
+<h3 id="133动态导出实现下拉列表"><a class="markdownIt-Anchor" href="#133动态导出实现下拉列表"></a> 1.3.3动态导出（实现下拉列表）</h3>
+<p>我们在做一些数据导出的时候，可能要对某一行的下拉数据进行约束限制。</p>
+<p>比如，当我们下载一个导入模板的时候，我们可以将性别，城市对应的列表设置为下拉选择。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-30-24.png"
+                        alt="" 
+                 ></p>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-31-27.png"
+                        alt="" 
+                 ></p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-31-37.png"
+                        alt="" 
+                 ></p>
+<h3 id="134动态导出横向合并"><a class="markdownIt-Anchor" href="#134动态导出横向合并"></a> 1.3.4动态导出（横向合并）</h3>
+<p>比如，我们将表头横向合并，只需要将合并的单元格设置为 ExcelUtils.COLUMN_MERGE 即可。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-33-09.png"
+                        alt="" 
+                 ></p>
+<p>测试效果：可以看到表头的地址已经被合并了。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-33-41.png"
+                        alt="" 
+                 ></p>
+<h3 id="135动态导出纵向合并"><a class="markdownIt-Anchor" href="#135动态导出纵向合并"></a> 1.3.5动态导出（纵向合并）</h3>
+<p>除了横向合并，我们还可以进行纵向合并，只需要将合并的单元格设置为ExcelUtils.ROW_MERGE即可。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-35-53.png"
+                        alt="" 
+                 ></p>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-36-12.png"
+                        alt="" 
+                 ></p>
+<h3 id="136导出模板基础"><a class="markdownIt-Anchor" href="#136导出模板基础"></a> 1.3.6导出模板（基础）</h3>
+<p>我们在做数据导入的时候，往往首先会提供一个模板供其下载，这样用户在导入的时候才知道如何去填写数据。导出模板除了可以用上面的动态导出，这里还提供了一种更加便捷的写法。只需要创建一个类，然后再对应字段上打上@ExcelExport注解即可。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-39-13.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">@GetMapping(&quot;/export&quot;)</span><br><span class="line">public void export(HttpServletResponse response) &#123;</span><br><span class="line">    ExcelUtils.exportTemplate(response, &quot;用户表&quot;, User.class);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码截图：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-39-43.png"
+                        alt="" 
+                 ></p>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-40-01.png"
+                        alt="" 
+                 ></p>
+<h3 id="137导出模板附示例数据"><a class="markdownIt-Anchor" href="#137导出模板附示例数据"></a> 1.3.7导出模板（附示例数据）</h3>
+<p>我们在做模板下载的时候，有时往往会携带一条样本数据，好提示用户格式是什么，那么我们只需要在对应字段上进行配置即可。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-41-58.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-42-18.png"
+                        alt="" 
+                 ></p>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_13-42-32.png"
+                        alt="" 
+                 ></p>
+<h3 id="138按对象导出基础"><a class="markdownIt-Anchor" href="#138按对象导出基础"></a> 1.3.8按对象导出（基础）</h3>
+<p>我们还可以通过List对象，对数据直接进行导出。首先，同样需要在对应的字段上，设置导出名称。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-04-07.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-17-47.png"
+                        alt="" 
+                 ></p>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-18-01.png"
+                        alt="" 
+                 ></p>
+<h3 id="139按对象导出数据映射"><a class="markdownIt-Anchor" href="#139按对象导出数据映射"></a> 1.3.9按对象导出（数据映射）</h3>
+<p>在上面1.3.8的导出中，我们可以看到，性别数据导出来是1和2，这个不利于用户体验，应该需要转换为对应的中文，我们可以在字段注解上进行对应的配置。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-25-31.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-26-03.png"
+                        alt="" 
+                 ></p>
+<p>测试效果：可以看到1和2显示为了对应的男女</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-26-42.png"
+                        alt="" 
+                 ></p>
+<h3 id="1310按对象导出调整表头顺序"><a class="markdownIt-Anchor" href="#1310按对象导出调整表头顺序"></a> 1.3.10按对象导出（调整表头顺序）</h3>
+<p>如果你需要对表头字段进行排序，有两种方式：</p>
+<p>第一种：按照表格的顺序，排序Java类中的字段；</p>
+<p>第二种：在@ExcelExport注解中，指定sort属性，其值越少，排名越靠前。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-28-35.png"
+                        alt="" 
+                 ></p>
+<p>Controller代码：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-29-01.png"
+                        alt="" 
+                 ></p>
+<p>测试效果：可以看到，此时导出数据的表头顺序，和我们指定的顺序完全一致。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-30-03.png"
+                        alt="" 
+                 ></p>
+<h3 id="1311多sheet页导出"><a class="markdownIt-Anchor" href="#1311多sheet页导出"></a> 1.3.11多Sheet页导出</h3>
+<p>Controller代码（示例）：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 导出多 Sheet 页实现</span><br><span class="line"> */</span><br><span class="line">@GetMapping(&quot;/exportManySheet&quot;)</span><br><span class="line">public void exportManySheet(HttpServletResponse response) &#123;</span><br><span class="line">    // 第 1 个 Sheet 页</span><br><span class="line">    List&lt;List&lt;Object&gt;&gt; sheet1 = new ArrayList&lt;&gt;();</span><br><span class="line">    List&lt;Object&gt; sheet1Head = new ArrayList&lt;&gt;();</span><br><span class="line">    sheet1Head.add(&quot;姓名&quot;);</span><br><span class="line">    sheet1Head.add(&quot;数学&quot;);</span><br><span class="line">    sheet1Head.add(&quot;英语&quot;);</span><br><span class="line">    sheet1.add(sheet1Head);</span><br><span class="line">    List&lt;Object&gt; row1 = new ArrayList&lt;&gt;();</span><br><span class="line">    row1.add(&quot;Jack&quot;);</span><br><span class="line">    row1.add(85);</span><br><span class="line">    row1.add(100);</span><br><span class="line">    sheet1.add(row1);</span><br><span class="line">    List&lt;Object&gt; row2 = new ArrayList&lt;&gt;();</span><br><span class="line">    row2.add(&quot;Marry&quot;);</span><br><span class="line">    row2.add(85);</span><br><span class="line">    row2.add(100);</span><br><span class="line">    sheet1.add(row2);</span><br><span class="line">    // 第 2 个 Sheet 页</span><br><span class="line">    List&lt;List&lt;Object&gt;&gt; sheet2 = new ArrayList&lt;&gt;();</span><br><span class="line">    List&lt;Object&gt; sheet2Head = new ArrayList&lt;&gt;();</span><br><span class="line">    sheet2Head.add(&quot;姓名&quot;);</span><br><span class="line">    sheet2Head.add(&quot;音乐&quot;);</span><br><span class="line">    sheet2Head.add(&quot;美术&quot;);</span><br><span class="line">    sheet2.add(sheet2Head);</span><br><span class="line">    List&lt;Object&gt; row01 = new ArrayList&lt;&gt;();</span><br><span class="line">    row01.add(&quot;Jack&quot;);</span><br><span class="line">    row01.add(77);</span><br><span class="line">    row01.add(66);</span><br><span class="line">    sheet2.add(row01);</span><br><span class="line">    List&lt;Object&gt; row02 = new ArrayList&lt;&gt;();</span><br><span class="line">    row02.add(&quot;Marry&quot;);</span><br><span class="line">    row02.add(99);</span><br><span class="line">    row02.add(88);</span><br><span class="line">    sheet2.add(row02);</span><br><span class="line">    // 将两个 Sheet 页添加到集合中</span><br><span class="line">    Map&lt;String, List&lt;List&lt;Object&gt;&gt;&gt; sheets = new LinkedHashMap&lt;&gt;();</span><br><span class="line">    sheets.put(&quot;文化课&quot;, sheet1);</span><br><span class="line">    sheets.put(&quot;艺术课&quot;, sheet2);</span><br><span class="line">    // 导出数据</span><br><span class="line">    ExcelUtils.exportManySheet(response, &quot;学生成绩表&quot;, sheets);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试效果：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-31-06.png"
+                        alt="" 
+                 ></p>
+<p>第一个Sheet页</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-31-26.png"
+                        alt="" 
+                 ></p>
+<p>第二个Sheet页</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-31-45.png"
+                        alt="" 
+                 ></p>
+<h2 id="2环境准备"><a class="markdownIt-Anchor" href="#2环境准备"></a> 2环境准备</h2>
+<h3 id="21maven依赖"><a class="markdownIt-Anchor" href="#21maven依赖"></a> 2.1Maven依赖</h3>
+<p>本次工具类的封装主要依赖于阿里巴巴的JSON包，以及表格 处理的POI包所以我们需要导入这两个库的以来包，另外，我们还需要文件上传的相关包，毕竟我们在浏览器页面，做Excel导入时，是上传的Excel文件。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;!-- 文件上传 --&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.apache.httpcomponents&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;httpmime&lt;/artifactId&gt;</span><br><span class="line">	&lt;version&gt;4.5.7&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;!-- JSON --&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.alibaba&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;fastjson&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;1.2.41&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;!-- POI --&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.apache.poi&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;poi-ooxml&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;3.16&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="22类文件"><a class="markdownIt-Anchor" href="#22类文件"></a> 2.2类文件</h3>
+<p>ExcelUtils</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">package com.sonar.data.utils.excel;</span><br><span class="line"> </span><br><span class="line">import com.alibaba.fastjson.JSONArray;</span><br><span class="line">import com.alibaba.fastjson.JSONObject;</span><br><span class="line">import org.apache.poi.hssf.usermodel.HSSFDataValidation;</span><br><span class="line">import org.apache.poi.hssf.usermodel.HSSFWorkbook;</span><br><span class="line">import org.apache.poi.poifs.filesystem.POIFSFileSystem;</span><br><span class="line">import org.apache.poi.ss.usermodel.*;</span><br><span class="line">import org.apache.poi.ss.usermodel.ClientAnchor.AnchorType;</span><br><span class="line">import org.apache.poi.ss.util.CellRangeAddress;</span><br><span class="line">import org.apache.poi.ss.util.CellRangeAddressList;</span><br><span class="line">import org.apache.poi.xssf.streaming.SXSSFWorkbook;</span><br><span class="line">import org.apache.poi.xssf.usermodel.XSSFClientAnchor;</span><br><span class="line">import org.apache.poi.xssf.usermodel.XSSFWorkbook;</span><br><span class="line">import org.springframework.web.multipart.MultipartFile;</span><br><span class="line"> </span><br><span class="line">import javax.servlet.ServletOutputStream;</span><br><span class="line">import javax.servlet.http.HttpServletResponse;</span><br><span class="line">import java.io.*;</span><br><span class="line">import java.lang.reflect.Field;</span><br><span class="line">import java.math.BigDecimal;</span><br><span class="line">import java.math.RoundingMode;</span><br><span class="line">import java.net.URL;</span><br><span class="line">import java.text.NumberFormat;</span><br><span class="line">import java.text.SimpleDateFormat;</span><br><span class="line">import java.util.*;</span><br><span class="line">import java.util.Map.Entry;</span><br><span class="line">import java.util.regex.Pattern;</span><br><span class="line"> </span><br><span class="line">/**</span><br><span class="line"> * Excel导入导出工具类</span><br><span class="line"> * 原文链接（不定时增加新功能）: https://zyqok.blog.csdn.net/article/details/121994504</span><br><span class="line"> *</span><br><span class="line"> * @author sunnyzyq</span><br><span class="line"> * @date 2021/12/17</span><br><span class="line"> */</span><br><span class="line">@SuppressWarnings(&quot;unused&quot;)</span><br><span class="line">public class ExcelUtils &#123;</span><br><span class="line"> </span><br><span class="line">    private static final String XLSX = &quot;.xlsx&quot;;</span><br><span class="line">    private static final String XLS = &quot;.xls&quot;;</span><br><span class="line">    public static final String ROW_MERGE = &quot;row_merge&quot;;</span><br><span class="line">    public static final String COLUMN_MERGE = &quot;column_merge&quot;;</span><br><span class="line">    private static final String DATE_FORMAT = &quot;yyyy-MM-dd HH:mm:ss&quot;;</span><br><span class="line">    private static final String ROW_NUM = &quot;rowNum&quot;;</span><br><span class="line">    private static final String ROW_DATA = &quot;rowData&quot;;</span><br><span class="line">    private static final String ROW_TIPS = &quot;rowTips&quot;;</span><br><span class="line">    private static final int CELL_OTHER = 0;</span><br><span class="line">    private static final int CELL_ROW_MERGE = 1;</span><br><span class="line">    private static final int CELL_COLUMN_MERGE = 2;</span><br><span class="line">    private static final int IMG_HEIGHT = 30;</span><br><span class="line">    private static final int IMG_WIDTH = 30;</span><br><span class="line">    private static final char LEAN_LINE = &#x27;/&#x27;;</span><br><span class="line">    private static final int BYTES_DEFAULT_LENGTH = 10240;</span><br><span class="line">    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance();</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">    public static &lt;T&gt; List&lt;T&gt; readFile(File file, Class&lt;T&gt; clazz) throws Exception &#123;</span><br><span class="line">        JSONArray array = readFile(file);</span><br><span class="line">        return getBeanList(array, clazz);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static &lt;T&gt; List&lt;T&gt; readMultipartFile(MultipartFile mFile, Class&lt;T&gt; clazz) throws Exception &#123;</span><br><span class="line">        JSONArray array = readMultipartFile(mFile);</span><br><span class="line">        return getBeanList(array, clazz);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static JSONArray readFile(File file) throws Exception &#123;</span><br><span class="line">        return readExcel(null, file);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static JSONArray readMultipartFile(MultipartFile mFile) throws Exception &#123;</span><br><span class="line">        return readExcel(mFile, null);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static Map&lt;String, JSONArray&gt; readFileManySheet(File file) throws Exception &#123;</span><br><span class="line">        return readExcelManySheet(null, file);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static Map&lt;String, JSONArray&gt; readFileManySheet(MultipartFile file) throws Exception &#123;</span><br><span class="line">        return readExcelManySheet(file, null);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static &lt;T&gt; List&lt;T&gt; getBeanList(JSONArray array, Class&lt;T&gt; clazz) throws Exception &#123;</span><br><span class="line">        List&lt;T&gt; list = new ArrayList&lt;&gt;();</span><br><span class="line">        Map&lt;Integer, String&gt; uniqueMap = new HashMap&lt;&gt;(16);</span><br><span class="line">        for (int i = 0; i &lt; array.size(); i++) &#123;</span><br><span class="line">            list.add(getBean(clazz, array.getJSONObject(i), uniqueMap));</span><br><span class="line">        &#125;</span><br><span class="line">        return list;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    /**</span><br><span class="line">     * 获取每个对象的数据</span><br><span class="line">     */</span><br><span class="line">    private static &lt;T&gt; T getBean(Class&lt;T&gt; c, JSONObject obj, Map&lt;Integer, String&gt; uniqueMap) throws Exception &#123;</span><br><span class="line">        T t = c.newInstance();</span><br><span class="line">        Field[] fields = c.getDeclaredFields();</span><br><span class="line">        List&lt;String&gt; errMsgList = new ArrayList&lt;&gt;();</span><br><span class="line">        boolean hasRowTipsField = false;</span><br><span class="line">        StringBuilder uniqueBuilder = new StringBuilder();</span><br><span class="line">        int rowNum = 0;</span><br><span class="line">        for (Field field : fields) &#123;</span><br><span class="line">            // 行号</span><br><span class="line">            if (field.getName().equals(ROW_NUM)) &#123;</span><br><span class="line">                rowNum = obj.getInteger(ROW_NUM);</span><br><span class="line">                field.setAccessible(true);</span><br><span class="line">                field.set(t, rowNum);</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line">            // 是否需要设置异常信息</span><br><span class="line">            if (field.getName().equals(ROW_TIPS)) &#123;</span><br><span class="line">                hasRowTipsField = true;</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line">            // 原始数据</span><br><span class="line">            if (field.getName().equals(ROW_DATA)) &#123;</span><br><span class="line">                field.setAccessible(true);</span><br><span class="line">                field.set(t, obj.toString());</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line">            // 设置对应属性值</span><br><span class="line">            setFieldValue(t, field, obj, uniqueBuilder, errMsgList);</span><br><span class="line">        &#125;</span><br><span class="line">        // 数据唯一性校验</span><br><span class="line">        if (uniqueBuilder.length() &gt; 0) &#123;</span><br><span class="line">            if (uniqueMap.containsValue(uniqueBuilder.toString())) &#123;</span><br><span class="line">                Set&lt;Integer&gt; rowNumKeys = uniqueMap.keySet();</span><br><span class="line">                for (Integer num : rowNumKeys) &#123;</span><br><span class="line">                    if (uniqueMap.get(num).equals(uniqueBuilder.toString())) &#123;</span><br><span class="line">                        errMsgList.add(String.format(&quot;数据唯一性校验失败,(%s)与第%s行重复)&quot;, uniqueBuilder, num));</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                uniqueMap.put(rowNum, uniqueBuilder.toString());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        // 失败处理</span><br><span class="line">        if (errMsgList.isEmpty() &amp;&amp; !hasRowTipsField) &#123;</span><br><span class="line">            return t;</span><br><span class="line">        &#125;</span><br><span class="line">        StringBuilder sb = new StringBuilder();</span><br><span class="line">        int size = errMsgList.size();</span><br><span class="line">        for (int i = 0; i &lt; size; i++) &#123;</span><br><span class="line">            if (i == size - 1) &#123;</span><br><span class="line">                sb.append(errMsgList.get(i));</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                sb.append(errMsgList.get(i)).append(&quot;;&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        // 设置错误信息</span><br><span class="line">        for (Field field : fields) &#123;</span><br><span class="line">            if (field.getName().equals(ROW_TIPS)) &#123;</span><br><span class="line">                field.setAccessible(true);</span><br><span class="line">                field.set(t, sb.toString());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return t;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static &lt;T&gt; void setFieldValue(T t, Field field, JSONObject obj, StringBuilder uniqueBuilder, List&lt;String&gt; errMsgList) &#123;</span><br><span class="line">        // 获取 ExcelImport 注解属性</span><br><span class="line">        ExcelImport annotation = field.getAnnotation(ExcelImport.class);</span><br><span class="line">        if (annotation == null) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        String cname = annotation.value();</span><br><span class="line">        if (cname.trim().length() == 0) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        // 获取具体值</span><br><span class="line">        String val = null;</span><br><span class="line">        if (obj.containsKey(cname)) &#123;</span><br><span class="line">            val = getString(obj.getString(cname));</span><br><span class="line">        &#125;</span><br><span class="line">        if (val == null) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        field.setAccessible(true);</span><br><span class="line">        // 判断是否必填</span><br><span class="line">        boolean require = annotation.required();</span><br><span class="line">        if (require &amp;&amp; val.isEmpty()) &#123;</span><br><span class="line">            errMsgList.add(String.format(&quot;[%s]不能为空&quot;, cname));</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        // 数据唯一性获取</span><br><span class="line">        boolean unique = annotation.unique();</span><br><span class="line">        if (unique) &#123;</span><br><span class="line">            if (uniqueBuilder.length() &gt; 0) &#123;</span><br><span class="line">                uniqueBuilder.append(&quot;--&quot;).append(val);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                uniqueBuilder.append(val);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        // 判断是否超过最大长度</span><br><span class="line">        int maxLength = annotation.maxLength();</span><br><span class="line">        if (maxLength &gt; 0 &amp;&amp; val.length() &gt; maxLength) &#123;</span><br><span class="line">            errMsgList.add(String.format(&quot;[%s]长度不能超过%s个字符(当前%s个字符)&quot;, cname, maxLength, val.length()));</span><br><span class="line">        &#125;</span><br><span class="line">        // 判断当前属性是否有映射关系</span><br><span class="line">        LinkedHashMap&lt;String, String&gt; kvMap = getKvMap(annotation.kv());</span><br><span class="line">        if (!kvMap.isEmpty()) &#123;</span><br><span class="line">            boolean isMatch = false;</span><br><span class="line">            for (String key : kvMap.keySet()) &#123;</span><br><span class="line">                if (kvMap.get(key).equals(val)) &#123;</span><br><span class="line">                    val = key;</span><br><span class="line">                    isMatch = true;</span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            if (!isMatch) &#123;</span><br><span class="line">                errMsgList.add(String.format(&quot;[%s]的值不正确(当前值为%s)&quot;, cname, val));</span><br><span class="line">                return;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        // 其余情况根据类型赋值</span><br><span class="line">        String fieldClassName = field.getType().getSimpleName();</span><br><span class="line">        try &#123;</span><br><span class="line">            if (&quot;String&quot;.equalsIgnoreCase(fieldClassName)) &#123;</span><br><span class="line">                field.set(t, val);</span><br><span class="line">            &#125; else if (&quot;boolean&quot;.equalsIgnoreCase(fieldClassName)) &#123;</span><br><span class="line">                field.set(t, Boolean.valueOf(val));</span><br><span class="line">            &#125; else if (&quot;int&quot;.equalsIgnoreCase(fieldClassName) || &quot;Integer&quot;.equals(fieldClassName)) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    field.set(t, Integer.valueOf(val));</span><br><span class="line">                &#125; catch (NumberFormatException e) &#123;</span><br><span class="line">                    errMsgList.add(String.format(&quot;[%s]的值格式不正确(当前值为%s)&quot;, cname, val));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; else if (&quot;double&quot;.equalsIgnoreCase(fieldClassName)) &#123;</span><br><span class="line">                field.set(t, Double.valueOf(val));</span><br><span class="line">            &#125; else if (&quot;long&quot;.equalsIgnoreCase(fieldClassName)) &#123;</span><br><span class="line">                field.set(t, Long.valueOf(val));</span><br><span class="line">            &#125; else if (&quot;BigDecimal&quot;.equalsIgnoreCase(fieldClassName)) &#123;</span><br><span class="line">                field.set(t, new BigDecimal(val));</span><br><span class="line">            &#125; else if (&quot;Date&quot;.equalsIgnoreCase(fieldClassName)) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    field.set(t, new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;).parse(val));</span><br><span class="line">                &#125; catch (Exception e) &#123;</span><br><span class="line">                    field.set(t, new SimpleDateFormat(&quot;yyyy-MM-dd&quot;).parse(val));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static Map&lt;String, JSONArray&gt; readExcelManySheet(MultipartFile mFile, File file) throws IOException &#123;</span><br><span class="line">        Workbook book = getWorkbook(mFile, file);</span><br><span class="line">        if (book == null) &#123;</span><br><span class="line">            return Collections.emptyMap();</span><br><span class="line">        &#125;</span><br><span class="line">        Map&lt;String, JSONArray&gt; map = new LinkedHashMap&lt;&gt;();</span><br><span class="line">        for (int i = 0; i &lt; book.getNumberOfSheets(); i++) &#123;</span><br><span class="line">            Sheet sheet = book.getSheetAt(i);</span><br><span class="line">            JSONArray arr = readSheet(sheet);</span><br><span class="line">            map.put(sheet.getSheetName(), arr);</span><br><span class="line">        &#125;</span><br><span class="line">        book.close();</span><br><span class="line">        return map;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static JSONArray readExcel(MultipartFile mFile, File file) throws IOException &#123;</span><br><span class="line">        Workbook book = getWorkbook(mFile, file);</span><br><span class="line">        if (book == null) &#123;</span><br><span class="line">            return new JSONArray();</span><br><span class="line">        &#125;</span><br><span class="line">        JSONArray array = readSheet(book.getSheetAt(0));</span><br><span class="line">        book.close();</span><br><span class="line">        return array;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static Workbook getWorkbook(MultipartFile mFile, File file) throws IOException &#123;</span><br><span class="line">        boolean fileNotExist = (file == null || !file.exists());</span><br><span class="line">        if (mFile == null &amp;&amp; fileNotExist) &#123;</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line">        // 解析表格数据</span><br><span class="line">        InputStream in;</span><br><span class="line">        String fileName;</span><br><span class="line">        if (mFile != null) &#123;</span><br><span class="line">            // 上传文件解析</span><br><span class="line">            in = mFile.getInputStream();</span><br><span class="line">            fileName = getString(mFile.getOriginalFilename()).toLowerCase();</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            // 本地文件解析</span><br><span class="line">            in = new FileInputStream(file);</span><br><span class="line">            fileName = file.getName().toLowerCase();</span><br><span class="line">        &#125;</span><br><span class="line">        Workbook book;</span><br><span class="line">        if (fileName.endsWith(XLSX)) &#123;</span><br><span class="line">            book = new XSSFWorkbook(in);</span><br><span class="line">        &#125; else if (fileName.endsWith(XLS)) &#123;</span><br><span class="line">            POIFSFileSystem poifsFileSystem = new POIFSFileSystem(in);</span><br><span class="line">            book = new HSSFWorkbook(poifsFileSystem);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line">        in.close();</span><br><span class="line">        return book;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static JSONArray readSheet(Sheet sheet) &#123;</span><br><span class="line">        // 首行下标</span><br><span class="line">        int rowStart = sheet.getFirstRowNum();</span><br><span class="line">        // 尾行下标</span><br><span class="line">        int rowEnd = sheet.getLastRowNum();</span><br><span class="line">        // 获取表头行</span><br><span class="line">        Row headRow = sheet.getRow(rowStart);</span><br><span class="line">        if (headRow == null) &#123;</span><br><span class="line">            return new JSONArray();</span><br><span class="line">        &#125;</span><br><span class="line">        int cellStart = headRow.getFirstCellNum();</span><br><span class="line">        int cellEnd = headRow.getLastCellNum();</span><br><span class="line">        Map&lt;Integer, String&gt; keyMap = new HashMap&lt;&gt;();</span><br><span class="line">        for (int j = cellStart; j &lt; cellEnd; j++) &#123;</span><br><span class="line">            // 获取表头数据</span><br><span class="line">            String val = getCellValue(headRow.getCell(j));</span><br><span class="line">            if (val != null &amp;&amp; val.trim().length() != 0) &#123;</span><br><span class="line">                keyMap.put(j, val);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        // 如果表头没有数据则不进行解析</span><br><span class="line">        if (keyMap.isEmpty()) &#123;</span><br><span class="line">            return (JSONArray) Collections.emptyList();</span><br><span class="line">        &#125;</span><br><span class="line">        // 获取每行JSON对象的值</span><br><span class="line">        JSONArray array = new JSONArray();</span><br><span class="line">        // 如果首行与尾行相同，表明只有一行，返回表头数据</span><br><span class="line">        if (rowStart == rowEnd) &#123;</span><br><span class="line">            JSONObject obj = new JSONObject();</span><br><span class="line">            // 添加行号</span><br><span class="line">            obj.put(ROW_NUM, 1);</span><br><span class="line">            for (int i : keyMap.keySet()) &#123;</span><br><span class="line">                obj.put(keyMap.get(i), &quot;&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">            array.add(obj);</span><br><span class="line">            return array;</span><br><span class="line">        &#125;</span><br><span class="line">        for (int i = rowStart + 1; i &lt;= rowEnd; i++) &#123;</span><br><span class="line">            Row eachRow = sheet.getRow(i);</span><br><span class="line">            JSONObject obj = new JSONObject();</span><br><span class="line">            // 添加行号</span><br><span class="line">            obj.put(ROW_NUM, i + 1);</span><br><span class="line">            StringBuilder sb = new StringBuilder();</span><br><span class="line">            for (int k = cellStart; k &lt; cellEnd; k++) &#123;</span><br><span class="line">                if (eachRow != null) &#123;</span><br><span class="line">                    String val = getCellValue(eachRow.getCell(k));</span><br><span class="line">                    // 所有数据添加到里面，用于判断该行是否为空</span><br><span class="line">                    sb.append(val);</span><br><span class="line">                    obj.put(keyMap.get(k), val);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            if (sb.length() &gt; 0) &#123;</span><br><span class="line">                array.add(obj);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return array;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static String getCellValue(Cell cell) &#123;</span><br><span class="line">        // 空白或空</span><br><span class="line">        if (cell == null || cell.getCellTypeEnum() == CellType.BLANK) &#123;</span><br><span class="line">            return &quot;&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">        // String类型</span><br><span class="line">        if (cell.getCellTypeEnum() == CellType.STRING) &#123;</span><br><span class="line">            String val = cell.getStringCellValue();</span><br><span class="line">            if (val == null || val.trim().length() == 0) &#123;</span><br><span class="line">                return &quot;&quot;;</span><br><span class="line">            &#125;</span><br><span class="line">            return val.trim();</span><br><span class="line">        &#125;</span><br><span class="line">        // 数字类型</span><br><span class="line">        if (cell.getCellTypeEnum() == CellType.NUMERIC) &#123;</span><br><span class="line">            String s = cell.getNumericCellValue() + &quot;&quot;;</span><br><span class="line">            // 去掉尾巴上的小数点0</span><br><span class="line">            if (Pattern.matches(&quot;.*\\.0*&quot;, s)) &#123;</span><br><span class="line">                return s.split(&quot;\\.&quot;)[0];</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                return s;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        // 布尔值类型</span><br><span class="line">        if (cell.getCellTypeEnum() == CellType.BOOLEAN) &#123;</span><br><span class="line">            return cell.getBooleanCellValue() + &quot;&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">        // 错误类型</span><br><span class="line">        return cell.getCellFormula();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static &lt;T&gt; void exportTemplate(HttpServletResponse response, String fileName, Class&lt;T&gt; clazz) &#123;</span><br><span class="line">        exportTemplate(response, fileName, fileName, clazz, false);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static &lt;T&gt; void exportTemplate(HttpServletResponse response, String fileName, String sheetName,</span><br><span class="line">                                          Class&lt;T&gt; clazz) &#123;</span><br><span class="line">        exportTemplate(response, fileName, sheetName, clazz, false);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static &lt;T&gt; void exportTemplate(HttpServletResponse response, String fileName, Class&lt;T&gt; clazz,</span><br><span class="line">                                          boolean isContainExample) &#123;</span><br><span class="line">        exportTemplate(response, fileName, fileName, clazz, isContainExample);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static &lt;T&gt; void exportTemplate(HttpServletResponse response, String fileName, String sheetName,</span><br><span class="line">                                          Class&lt;T&gt; clazz, boolean isContainExample) &#123;</span><br><span class="line">        // 获取表头字段</span><br><span class="line">        List&lt;ExcelClassField&gt; headFieldList = getExcelClassFieldList(clazz);</span><br><span class="line">        // 获取表头数据和示例数据</span><br><span class="line">        List&lt;List&lt;Object&gt;&gt; sheetDataList = new ArrayList&lt;&gt;();</span><br><span class="line">        List&lt;Object&gt; headList = new ArrayList&lt;&gt;();</span><br><span class="line">        List&lt;Object&gt; exampleList = new ArrayList&lt;&gt;();</span><br><span class="line">        Map&lt;Integer, List&lt;String&gt;&gt; selectMap = new LinkedHashMap&lt;&gt;();</span><br><span class="line">        for (int i = 0; i &lt; headFieldList.size(); i++) &#123;</span><br><span class="line">            ExcelClassField each = headFieldList.get(i);</span><br><span class="line">            headList.add(each.getName());</span><br><span class="line">            exampleList.add(each.getExample());</span><br><span class="line">            LinkedHashMap&lt;String, String&gt; kvMap = each.getKvMap();</span><br><span class="line">            if (kvMap != null &amp;&amp; kvMap.size() &gt; 0) &#123;</span><br><span class="line">                selectMap.put(i, new ArrayList&lt;&gt;(kvMap.values()));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        sheetDataList.add(headList);</span><br><span class="line">        if (isContainExample) &#123;</span><br><span class="line">            sheetDataList.add(exampleList);</span><br><span class="line">        &#125;</span><br><span class="line">        // 导出数据</span><br><span class="line">        export(response, fileName, sheetName, sheetDataList, selectMap);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static &lt;T&gt; List&lt;ExcelClassField&gt; getExcelClassFieldList(Class&lt;T&gt; clazz) &#123;</span><br><span class="line">        // 解析所有字段</span><br><span class="line">        Field[] fields = clazz.getDeclaredFields();</span><br><span class="line">        boolean hasExportAnnotation = false;</span><br><span class="line">        Map&lt;Integer, List&lt;ExcelClassField&gt;&gt; map = new LinkedHashMap&lt;&gt;();</span><br><span class="line">        List&lt;Integer&gt; sortList = new ArrayList&lt;&gt;();</span><br><span class="line">        for (Field field : fields) &#123;</span><br><span class="line">            ExcelClassField cf = getExcelClassField(field);</span><br><span class="line">            if (cf.getHasAnnotation() == 1) &#123;</span><br><span class="line">                hasExportAnnotation = true;</span><br><span class="line">            &#125;</span><br><span class="line">            int sort = cf.getSort();</span><br><span class="line">            if (map.containsKey(sort)) &#123;</span><br><span class="line">                map.get(sort).add(cf);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                List&lt;ExcelClassField&gt; list = new ArrayList&lt;&gt;();</span><br><span class="line">                list.add(cf);</span><br><span class="line">                sortList.add(sort);</span><br><span class="line">                map.put(sort, list);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        Collections.sort(sortList);</span><br><span class="line">        // 获取表头</span><br><span class="line">        List&lt;ExcelClassField&gt; headFieldList = new ArrayList&lt;&gt;();</span><br><span class="line">        if (hasExportAnnotation) &#123;</span><br><span class="line">            for (Integer sort : sortList) &#123;</span><br><span class="line">                for (ExcelClassField cf : map.get(sort)) &#123;</span><br><span class="line">                    if (cf.getHasAnnotation() == 1) &#123;</span><br><span class="line">                        headFieldList.add(cf);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            headFieldList.addAll(map.get(0));</span><br><span class="line">        &#125;</span><br><span class="line">        return headFieldList;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static ExcelClassField getExcelClassField(Field field) &#123;</span><br><span class="line">        ExcelClassField cf = new ExcelClassField();</span><br><span class="line">        String fieldName = field.getName();</span><br><span class="line">        cf.setFieldName(fieldName);</span><br><span class="line">        ExcelExport annotation = field.getAnnotation(ExcelExport.class);</span><br><span class="line">        // 无 ExcelExport 注解情况</span><br><span class="line">        if (annotation == null) &#123;</span><br><span class="line">            cf.setHasAnnotation(0);</span><br><span class="line">            cf.setName(fieldName);</span><br><span class="line">            cf.setSort(0);</span><br><span class="line">            return cf;</span><br><span class="line">        &#125;</span><br><span class="line">        // 有 ExcelExport 注解情况</span><br><span class="line">        cf.setHasAnnotation(1);</span><br><span class="line">        cf.setName(annotation.value());</span><br><span class="line">        String example = getString(annotation.example());</span><br><span class="line">        if (!example.isEmpty()) &#123;</span><br><span class="line">            if (isNumeric(example) &amp;&amp; example.length() &lt; 8) &#123;</span><br><span class="line">                cf.setExample(Double.valueOf(example));</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                cf.setExample(example);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            cf.setExample(&quot;&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        cf.setSort(annotation.sort());</span><br><span class="line">        // 解析映射</span><br><span class="line">        String kv = getString(annotation.kv());</span><br><span class="line">        cf.setKvMap(getKvMap(kv));</span><br><span class="line">        return cf;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static LinkedHashMap&lt;String, String&gt; getKvMap(String kv) &#123;</span><br><span class="line">        LinkedHashMap&lt;String, String&gt; kvMap = new LinkedHashMap&lt;&gt;();</span><br><span class="line">        if (kv.isEmpty()) &#123;</span><br><span class="line">            return kvMap;</span><br><span class="line">        &#125;</span><br><span class="line">        String[] kvs = kv.split(&quot;;&quot;);</span><br><span class="line">        if (kvs.length == 0) &#123;</span><br><span class="line">            return kvMap;</span><br><span class="line">        &#125;</span><br><span class="line">        for (String each : kvs) &#123;</span><br><span class="line">            String[] eachKv = getString(each).split(&quot;-&quot;);</span><br><span class="line">            if (eachKv.length != 2) &#123;</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line">            String k = eachKv[0];</span><br><span class="line">            String v = eachKv[1];</span><br><span class="line">            if (k.isEmpty() || v.isEmpty()) &#123;</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line">            kvMap.put(k, v);</span><br><span class="line">        &#125;</span><br><span class="line">        return kvMap;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    /**</span><br><span class="line">     * 导出表格到本地</span><br><span class="line">     *</span><br><span class="line">     * @param file      本地文件对象</span><br><span class="line">     * @param sheetData 导出数据</span><br><span class="line">     */</span><br><span class="line">    public static void exportFile(File file, List&lt;List&lt;Object&gt;&gt; sheetData) &#123;</span><br><span class="line">        if (file == null) &#123;</span><br><span class="line">            System.out.println(&quot;文件创建失败&quot;);</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        if (sheetData == null) &#123;</span><br><span class="line">            sheetData = new ArrayList&lt;&gt;();</span><br><span class="line">        &#125;</span><br><span class="line">        Map&lt;String, List&lt;List&lt;Object&gt;&gt;&gt; map = new HashMap&lt;&gt;();</span><br><span class="line">        map.put(file.getName(), sheetData);</span><br><span class="line">        export(null, file, file.getName(), map, null);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    /**</span><br><span class="line">     * 导出表格到本地</span><br><span class="line">     *</span><br><span class="line">     * @param &lt;T&gt;      导出数据类似，和K类型保持一致</span><br><span class="line">     * @param filePath 文件父路径（如：D:/doc/excel/）</span><br><span class="line">     * @param fileName 文件名称（不带尾缀，如：学生表）</span><br><span class="line">     * @param list     导出数据</span><br><span class="line">     * @throws IOException IO异常</span><br><span class="line">     */</span><br><span class="line">    public static &lt;T&gt; File exportFile(String filePath, String fileName, List&lt;T&gt; list) throws IOException &#123;</span><br><span class="line">        File file = getFile(filePath, fileName);</span><br><span class="line">        List&lt;List&lt;Object&gt;&gt; sheetData = getSheetData(list);</span><br><span class="line">        exportFile(file, sheetData);</span><br><span class="line">        return file;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    /**</span><br><span class="line">     * 获取文件</span><br><span class="line">     *</span><br><span class="line">     * @param filePath filePath 文件父路径（如：D:/doc/excel/）</span><br><span class="line">     * @param fileName 文件名称（不带尾缀，如：用户表）</span><br><span class="line">     * @return 本地File文件对象</span><br><span class="line">     */</span><br><span class="line">    private static File getFile(String filePath, String fileName) throws IOException &#123;</span><br><span class="line">        String dirPath = getString(filePath);</span><br><span class="line">        String fileFullPath;</span><br><span class="line">        if (dirPath.isEmpty()) &#123;</span><br><span class="line">            fileFullPath = fileName;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            // 判定文件夹是否存在，如果不存在，则级联创建</span><br><span class="line">            File dirFile = new File(dirPath);</span><br><span class="line">            if (!dirFile.exists()) &#123;</span><br><span class="line">                boolean mkdirs = dirFile.mkdirs();</span><br><span class="line">                if (!mkdirs) &#123;</span><br><span class="line">                    return null;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            // 获取文件夹全名</span><br><span class="line">            if (dirPath.endsWith(String.valueOf(LEAN_LINE))) &#123;</span><br><span class="line">                fileFullPath = dirPath + fileName + XLSX;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                fileFullPath = dirPath + LEAN_LINE + fileName + XLSX;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(fileFullPath);</span><br><span class="line">        File file = new File(fileFullPath);</span><br><span class="line">        if (!file.exists()) &#123;</span><br><span class="line">            boolean result = file.createNewFile();</span><br><span class="line">            if (!result) &#123;</span><br><span class="line">                return null;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return file;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static &lt;T&gt; List&lt;List&lt;Object&gt;&gt; getSheetData(List&lt;T&gt; list) &#123;</span><br><span class="line">        // 获取表头字段</span><br><span class="line">        List&lt;ExcelClassField&gt; excelClassFieldList = getExcelClassFieldList(list.get(0).getClass());</span><br><span class="line">        List&lt;String&gt; headFieldList = new ArrayList&lt;&gt;();</span><br><span class="line">        List&lt;Object&gt; headList = new ArrayList&lt;&gt;();</span><br><span class="line">        Map&lt;String, ExcelClassField&gt; headFieldMap = new HashMap&lt;&gt;();</span><br><span class="line">        for (ExcelClassField each : excelClassFieldList) &#123;</span><br><span class="line">            String fieldName = each.getFieldName();</span><br><span class="line">            headFieldList.add(fieldName);</span><br><span class="line">            headFieldMap.put(fieldName, each);</span><br><span class="line">            headList.add(each.getName());</span><br><span class="line">        &#125;</span><br><span class="line">        // 添加表头名称</span><br><span class="line">        List&lt;List&lt;Object&gt;&gt; sheetDataList = new ArrayList&lt;&gt;();</span><br><span class="line">        sheetDataList.add(headList);</span><br><span class="line">        // 获取表数据</span><br><span class="line">        for (T t : list) &#123;</span><br><span class="line">            Map&lt;String, Object&gt; fieldDataMap = getFieldDataMap(t);</span><br><span class="line">            Set&lt;String&gt; fieldDataKeys = fieldDataMap.keySet();</span><br><span class="line">            List&lt;Object&gt; rowList = new ArrayList&lt;&gt;();</span><br><span class="line">            for (String headField : headFieldList) &#123;</span><br><span class="line">                if (!fieldDataKeys.contains(headField)) &#123;</span><br><span class="line">                    continue;</span><br><span class="line">                &#125;</span><br><span class="line">                Object data = fieldDataMap.get(headField);</span><br><span class="line">                if (data == null) &#123;</span><br><span class="line">                    rowList.add(&quot;&quot;);</span><br><span class="line">                    continue;</span><br><span class="line">                &#125;</span><br><span class="line">                ExcelClassField cf = headFieldMap.get(headField);</span><br><span class="line">                // 判断是否有映射关系</span><br><span class="line">                LinkedHashMap&lt;String, String&gt; kvMap = cf.getKvMap();</span><br><span class="line">                if (kvMap == null || kvMap.isEmpty()) &#123;</span><br><span class="line">                    rowList.add(data);</span><br><span class="line">                    continue;</span><br><span class="line">                &#125;</span><br><span class="line">                String val = kvMap.get(data.toString());</span><br><span class="line">                if (isNumeric(val)) &#123;</span><br><span class="line">                    rowList.add(Double.valueOf(val));</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    rowList.add(val);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            sheetDataList.add(rowList);</span><br><span class="line">        &#125;</span><br><span class="line">        return sheetDataList;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static &lt;T&gt; Map&lt;String, Object&gt; getFieldDataMap(T t) &#123;</span><br><span class="line">        Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();</span><br><span class="line">        Field[] fields = t.getClass().getDeclaredFields();</span><br><span class="line">        try &#123;</span><br><span class="line">            for (Field field : fields) &#123;</span><br><span class="line">                String fieldName = field.getName();</span><br><span class="line">                field.setAccessible(true);</span><br><span class="line">                Object object = field.get(t);</span><br><span class="line">                map.put(fieldName, object);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (IllegalArgumentException | IllegalAccessException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        return map;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static void exportEmpty(HttpServletResponse response, String fileName) &#123;</span><br><span class="line">        List&lt;List&lt;Object&gt;&gt; sheetDataList = new ArrayList&lt;&gt;();</span><br><span class="line">        List&lt;Object&gt; headList = new ArrayList&lt;&gt;();</span><br><span class="line">        headList.add(&quot;导出无数据&quot;);</span><br><span class="line">        sheetDataList.add(headList);</span><br><span class="line">        export(response, fileName, sheetDataList);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static void export(HttpServletResponse response, String fileName, List&lt;List&lt;Object&gt;&gt; sheetDataList) &#123;</span><br><span class="line">        export(response, fileName, fileName, sheetDataList, null);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static void exportManySheet(HttpServletResponse response, String fileName, Map&lt;String, List&lt;List&lt;Object&gt;&gt;&gt; sheetMap) &#123;</span><br><span class="line">        export(response, null, fileName, sheetMap, null);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">    public static void export(HttpServletResponse response, String fileName, String sheetName,</span><br><span class="line">                              List&lt;List&lt;Object&gt;&gt; sheetDataList) &#123;</span><br><span class="line">        export(response, fileName, sheetName, sheetDataList, null);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static void export(HttpServletResponse response, String fileName, String sheetName,</span><br><span class="line">                              List&lt;List&lt;Object&gt;&gt; sheetDataList, Map&lt;Integer, List&lt;String&gt;&gt; selectMap) &#123;</span><br><span class="line"> </span><br><span class="line">        Map&lt;String, List&lt;List&lt;Object&gt;&gt;&gt; map = new HashMap&lt;&gt;();</span><br><span class="line">        map.put(sheetName, sheetDataList);</span><br><span class="line">        export(response, null, fileName, map, selectMap);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static &lt;T, K&gt; void export(HttpServletResponse response, String fileName, List&lt;T&gt; list, Class&lt;K&gt; template) &#123;</span><br><span class="line">        // list 是否为空</span><br><span class="line">        boolean lisIsEmpty = list == null || list.isEmpty();</span><br><span class="line">        // 如果模板数据为空，且导入的数据为空，则导出空文件</span><br><span class="line">        if (template == null &amp;&amp; lisIsEmpty) &#123;</span><br><span class="line">            exportEmpty(response, fileName);</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        // 如果 list 数据，则导出模板数据</span><br><span class="line">        if (lisIsEmpty) &#123;</span><br><span class="line">            exportTemplate(response, fileName, template);</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        // 导出数据</span><br><span class="line">        List&lt;List&lt;Object&gt;&gt; sheetDataList = getSheetData(list);</span><br><span class="line">        export(response, fileName, sheetDataList);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public static void export(HttpServletResponse response, String fileName, List&lt;List&lt;Object&gt;&gt; sheetDataList, Map&lt;Integer, List&lt;String&gt;&gt; selectMap) &#123;</span><br><span class="line">        export(response, fileName, fileName, sheetDataList, selectMap);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static void export(HttpServletResponse response, File file, String fileName,</span><br><span class="line">                               Map&lt;String, List&lt;List&lt;Object&gt;&gt;&gt; sheetMap, Map&lt;Integer, List&lt;String&gt;&gt; selectMap) &#123;</span><br><span class="line">        // 整个 Excel 表格 book 对象</span><br><span class="line">        SXSSFWorkbook book = new SXSSFWorkbook();</span><br><span class="line">        // 每个 Sheet 页</span><br><span class="line">        Set&lt;Entry&lt;String, List&lt;List&lt;Object&gt;&gt;&gt;&gt; entries = sheetMap.entrySet();</span><br><span class="line">        for (Entry&lt;String, List&lt;List&lt;Object&gt;&gt;&gt; entry : entries) &#123;</span><br><span class="line">            List&lt;List&lt;Object&gt;&gt; sheetDataList = entry.getValue();</span><br><span class="line">            Sheet sheet = book.createSheet(entry.getKey());</span><br><span class="line">            Drawing&lt;?&gt; patriarch = sheet.createDrawingPatriarch();</span><br><span class="line">            // 设置表头背景色（灰色）</span><br><span class="line">            CellStyle headStyle = book.createCellStyle();</span><br><span class="line">            headStyle.setFillForegroundColor(IndexedColors.GREY_80_PERCENT.index);</span><br><span class="line">            headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);</span><br><span class="line">            headStyle.setAlignment(HorizontalAlignment.CENTER);</span><br><span class="line">            headStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);</span><br><span class="line">            // 设置表身背景色（默认色）</span><br><span class="line">            CellStyle rowStyle = book.createCellStyle();</span><br><span class="line">            rowStyle.setAlignment(HorizontalAlignment.CENTER);</span><br><span class="line">            rowStyle.setVerticalAlignment(VerticalAlignment.CENTER);</span><br><span class="line">            // 设置表格列宽度（默认为15个字节）</span><br><span class="line">            sheet.setDefaultColumnWidth(15);</span><br><span class="line">            // 创建合并算法数组</span><br><span class="line">            int rowLength = sheetDataList.size();</span><br><span class="line">            int columnLength = sheetDataList.get(0).size();</span><br><span class="line">            int[][] mergeArray = new int[rowLength][columnLength];</span><br><span class="line">            for (int i = 0; i &lt; sheetDataList.size(); i++) &#123;</span><br><span class="line">                // 每个 Sheet 页中的行数据</span><br><span class="line">                Row row = sheet.createRow(i);</span><br><span class="line">                List&lt;Object&gt; rowList = sheetDataList.get(i);</span><br><span class="line">                for (int j = 0; j &lt; rowList.size(); j++) &#123;</span><br><span class="line">                    // 每个行数据中的单元格数据</span><br><span class="line">                    Object o = rowList.get(j);</span><br><span class="line">                    int v = 0;</span><br><span class="line">                    if (o instanceof URL) &#123;</span><br><span class="line">                        // 如果要导出图片的话, 链接需要传递 URL 对象</span><br><span class="line">                        setCellPicture(book, row, patriarch, i, j, (URL) o);</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        Cell cell = row.createCell(j);</span><br><span class="line">                        if (i == 0) &#123;</span><br><span class="line">                            // 第一行为表头行，采用灰色底背景</span><br><span class="line">                            v = setCellValue(cell, o, headStyle);</span><br><span class="line">                        &#125; else &#123;</span><br><span class="line">                            // 其他行为数据行，默认白底色</span><br><span class="line">                            v = setCellValue(cell, o, rowStyle);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    mergeArray[i][j] = v;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            // 合并单元格</span><br><span class="line">            mergeCells(sheet, mergeArray);</span><br><span class="line">            // 设置下拉列表</span><br><span class="line">            setSelect(sheet, selectMap);</span><br><span class="line">        &#125;</span><br><span class="line">        // 写数据</span><br><span class="line">        if (response != null) &#123;</span><br><span class="line">            // 前端导出</span><br><span class="line">            try &#123;</span><br><span class="line">                write(response, book, fileName);</span><br><span class="line">            &#125; catch (IOException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            // 本地导出</span><br><span class="line">            FileOutputStream fos;</span><br><span class="line">            try &#123;</span><br><span class="line">                fos = new FileOutputStream(file);</span><br><span class="line">                ByteArrayOutputStream ops = new ByteArrayOutputStream();</span><br><span class="line">                book.write(ops);</span><br><span class="line">                fos.write(ops.toByteArray());</span><br><span class="line">                fos.close();</span><br><span class="line">            &#125; catch (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    /**</span><br><span class="line">     * 合并当前Sheet页的单元格</span><br><span class="line">     *</span><br><span class="line">     * @param sheet      当前 sheet 页</span><br><span class="line">     * @param mergeArray 合并单元格算法</span><br><span class="line">     */</span><br><span class="line">    private static void mergeCells(Sheet sheet, int[][] mergeArray) &#123;</span><br><span class="line">        // 横向合并</span><br><span class="line">        for (int x = 0; x &lt; mergeArray.length; x++) &#123;</span><br><span class="line">            int[] arr = mergeArray[x];</span><br><span class="line">            boolean merge = false;</span><br><span class="line">            int y1 = 0;</span><br><span class="line">            int y2 = 0;</span><br><span class="line">            for (int y = 0; y &lt; arr.length; y++) &#123;</span><br><span class="line">                int value = arr[y];</span><br><span class="line">                if (value == CELL_COLUMN_MERGE) &#123;</span><br><span class="line">                    if (!merge) &#123;</span><br><span class="line">                        y1 = y;</span><br><span class="line">                    &#125;</span><br><span class="line">                    y2 = y;</span><br><span class="line">                    merge = true;</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    merge = false;</span><br><span class="line">                    if (y1 &gt; 0) &#123;</span><br><span class="line">                        sheet.addMergedRegion(new CellRangeAddress(x, x, (y1 - 1), y2));</span><br><span class="line">                    &#125;</span><br><span class="line">                    y1 = 0;</span><br><span class="line">                    y2 = 0;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            if (y1 &gt; 0) &#123;</span><br><span class="line">                sheet.addMergedRegion(new CellRangeAddress(x, x, (y1 - 1), y2));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        // 纵向合并</span><br><span class="line">        int xLen = mergeArray.length;</span><br><span class="line">        int yLen = mergeArray[0].length;</span><br><span class="line">        for (int y = 0; y &lt; yLen; y++) &#123;</span><br><span class="line">            boolean merge = false;</span><br><span class="line">            int x1 = 0;</span><br><span class="line">            int x2 = 0;</span><br><span class="line">            for (int x = 0; x &lt; xLen; x++) &#123;</span><br><span class="line">                int value = mergeArray[x][y];</span><br><span class="line">                if (value == CELL_ROW_MERGE) &#123;</span><br><span class="line">                    if (!merge) &#123;</span><br><span class="line">                        x1 = x;</span><br><span class="line">                    &#125;</span><br><span class="line">                    x2 = x;</span><br><span class="line">                    merge = true;</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    merge = false;</span><br><span class="line">                    if (x1 &gt; 0) &#123;</span><br><span class="line">                        sheet.addMergedRegion(new CellRangeAddress((x1 - 1), x2, y, y));</span><br><span class="line">                    &#125;</span><br><span class="line">                    x1 = 0;</span><br><span class="line">                    x2 = 0;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            if (x1 &gt; 0) &#123;</span><br><span class="line">                sheet.addMergedRegion(new CellRangeAddress((x1 - 1), x2, y, y));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static void write(HttpServletResponse response, SXSSFWorkbook book, String fileName) throws IOException &#123;</span><br><span class="line">        response.setContentType(&quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&quot;);</span><br><span class="line">        response.setCharacterEncoding(&quot;utf-8&quot;);</span><br><span class="line">        String name = new String(fileName.getBytes(&quot;GBK&quot;), &quot;ISO8859_1&quot;) + XLSX;</span><br><span class="line">        response.addHeader(&quot;Content-Disposition&quot;, &quot;attachment;filename=&quot; + name);</span><br><span class="line">        ServletOutputStream out = response.getOutputStream();</span><br><span class="line">        book.write(out);</span><br><span class="line">        out.flush();</span><br><span class="line">        out.close();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static int setCellValue(Cell cell, Object o, CellStyle style) &#123;</span><br><span class="line">        // 设置样式</span><br><span class="line">        cell.setCellStyle(style);</span><br><span class="line">        // 数据为空时</span><br><span class="line">        if (o == null) &#123;</span><br><span class="line">            cell.setCellType(CellType.STRING);</span><br><span class="line">            cell.setCellValue(&quot;&quot;);</span><br><span class="line">            return CELL_OTHER;</span><br><span class="line">        &#125;</span><br><span class="line">        // 是否为字符串</span><br><span class="line">        if (o instanceof String) &#123;</span><br><span class="line">            String s = o.toString();</span><br><span class="line">            // 当数字类型长度超过8位时，改为字符串类型显示（Excel数字超过一定长度会显示为科学计数法）</span><br><span class="line">            if (isNumeric(s) &amp;&amp; s.length() &lt; 8) &#123;</span><br><span class="line">                cell.setCellType(CellType.NUMERIC);</span><br><span class="line">                cell.setCellValue(Double.parseDouble(s));</span><br><span class="line">                return CELL_OTHER;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                cell.setCellType(CellType.STRING);</span><br><span class="line">                cell.setCellValue(s);</span><br><span class="line">            &#125;</span><br><span class="line">            if (s.equals(ROW_MERGE)) &#123;</span><br><span class="line">                return CELL_ROW_MERGE;</span><br><span class="line">            &#125; else if (s.equals(COLUMN_MERGE)) &#123;</span><br><span class="line">                return CELL_COLUMN_MERGE;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                return CELL_OTHER;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        // 是否为字符串</span><br><span class="line">        if (o instanceof Integer || o instanceof Long || o instanceof Double || o instanceof Float) &#123;</span><br><span class="line">            cell.setCellType(CellType.NUMERIC);</span><br><span class="line">            cell.setCellValue(Double.parseDouble(o.toString()));</span><br><span class="line">            return CELL_OTHER;</span><br><span class="line">        &#125;</span><br><span class="line">        // 是否为Boolean</span><br><span class="line">        if (o instanceof Boolean) &#123;</span><br><span class="line">            cell.setCellType(CellType.BOOLEAN);</span><br><span class="line">            cell.setCellValue((Boolean) o);</span><br><span class="line">            return CELL_OTHER;</span><br><span class="line">        &#125;</span><br><span class="line">        // 如果是BigDecimal，则默认3位小数</span><br><span class="line">        if (o instanceof BigDecimal) &#123;</span><br><span class="line">            cell.setCellType(CellType.NUMERIC);</span><br><span class="line">            cell.setCellValue(((BigDecimal) o).setScale(3, RoundingMode.HALF_UP).doubleValue());</span><br><span class="line">            return CELL_OTHER;</span><br><span class="line">        &#125;</span><br><span class="line">        // 如果是Date数据，则显示格式化数据</span><br><span class="line">        if (o instanceof Date) &#123;</span><br><span class="line">            cell.setCellType(CellType.STRING);</span><br><span class="line">            cell.setCellValue(formatDate((Date) o));</span><br><span class="line">            return CELL_OTHER;</span><br><span class="line">        &#125;</span><br><span class="line">        // 如果是其他，则默认字符串类型</span><br><span class="line">        cell.setCellType(CellType.STRING);</span><br><span class="line">        cell.setCellValue(o.toString());</span><br><span class="line">        return CELL_OTHER;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static void setCellPicture(SXSSFWorkbook wb, Row sr, Drawing&lt;?&gt; patriarch, int x, int y, URL url) &#123;</span><br><span class="line">        // 设置图片宽高</span><br><span class="line">        sr.setHeight((short) (IMG_WIDTH * IMG_HEIGHT));</span><br><span class="line">        // （jdk1.7版本try中定义流可自动关闭）</span><br><span class="line">        try (InputStream is = url.openStream(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) &#123;</span><br><span class="line">            byte[] buff = new byte[BYTES_DEFAULT_LENGTH];</span><br><span class="line">            int rc;</span><br><span class="line">            while ((rc = is.read(buff, 0, BYTES_DEFAULT_LENGTH)) &gt; 0) &#123;</span><br><span class="line">                outputStream.write(buff, 0, rc);</span><br><span class="line">            &#125;</span><br><span class="line">            // 设置图片位置</span><br><span class="line">            XSSFClientAnchor anchor = new XSSFClientAnchor(0, 0, 0, 0, y, x, y + 1, x + 1);</span><br><span class="line">            // 设置这个，图片会自动填满单元格的长宽</span><br><span class="line">            anchor.setAnchorType(AnchorType.MOVE_AND_RESIZE);</span><br><span class="line">            patriarch.createPicture(anchor, wb.addPicture(outputStream.toByteArray(), HSSFWorkbook.PICTURE_TYPE_JPEG));</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static String formatDate(Date date) &#123;</span><br><span class="line">        if (date == null) &#123;</span><br><span class="line">            return &quot;&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">        SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);</span><br><span class="line">        return format.format(date);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static void setSelect(Sheet sheet, Map&lt;Integer, List&lt;String&gt;&gt; selectMap) &#123;</span><br><span class="line">        if (selectMap == null || selectMap.isEmpty()) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        Set&lt;Entry&lt;Integer, List&lt;String&gt;&gt;&gt; entrySet = selectMap.entrySet();</span><br><span class="line">        for (Entry&lt;Integer, List&lt;String&gt;&gt; entry : entrySet) &#123;</span><br><span class="line">            int y = entry.getKey();</span><br><span class="line">            List&lt;String&gt; list = entry.getValue();</span><br><span class="line">            if (list == null || list.isEmpty()) &#123;</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line">            String[] arr = new String[list.size()];</span><br><span class="line">            for (int i = 0; i &lt; list.size(); i++) &#123;</span><br><span class="line">                arr[i] = list.get(i);</span><br><span class="line">            &#125;</span><br><span class="line">            DataValidationHelper helper = sheet.getDataValidationHelper();</span><br><span class="line">            CellRangeAddressList addressList = new CellRangeAddressList(1, 65000, y, y);</span><br><span class="line">            DataValidationConstraint dvc = helper.createExplicitListConstraint(arr);</span><br><span class="line">            DataValidation dv = helper.createValidation(dvc, addressList);</span><br><span class="line">            if (dv instanceof HSSFDataValidation) &#123;</span><br><span class="line">                dv.setSuppressDropDownArrow(false);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                dv.setSuppressDropDownArrow(true);</span><br><span class="line">                dv.setShowErrorBox(true);</span><br><span class="line">            &#125;</span><br><span class="line">            sheet.addValidationData(dv);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static boolean isNumeric(String str) &#123;</span><br><span class="line">        if (Objects.nonNull(str) &amp;&amp; &quot;0.0&quot;.equals(str)) &#123;</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">        for (int i = str.length(); --i &gt;= 0; ) &#123;</span><br><span class="line">            if (!Character.isDigit(str.charAt(i))) &#123;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    private static String getString(String s) &#123;</span><br><span class="line">        if (s == null) &#123;</span><br><span class="line">            return &quot;&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">        if (s.isEmpty()) &#123;</span><br><span class="line">            return s;</span><br><span class="line">        &#125;</span><br><span class="line">        return s.trim();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ExcelImport</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">package com.zyq.util.excel;</span><br><span class="line"> </span><br><span class="line">import java.lang.annotation.ElementType;</span><br><span class="line">import java.lang.annotation.Retention;</span><br><span class="line">import java.lang.annotation.RetentionPolicy;</span><br><span class="line">import java.lang.annotation.Target;</span><br><span class="line"> </span><br><span class="line">/**</span><br><span class="line"> * @author sunnyzyq</span><br><span class="line"> * @date 2021/12/17</span><br><span class="line"> */</span><br><span class="line">@Target(ElementType.FIELD)</span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">public @interface ExcelImport &#123;</span><br><span class="line"> </span><br><span class="line">    /** 字段名称 */</span><br><span class="line">    String value();</span><br><span class="line"> </span><br><span class="line">    /** 导出映射，格式如：0-未知;1-男;2-女 */</span><br><span class="line">    String kv() default &quot;&quot;;</span><br><span class="line"> </span><br><span class="line">    /** 是否为必填字段（默认为非必填） */</span><br><span class="line">    boolean required() default false;</span><br><span class="line"> </span><br><span class="line">    /** 最大长度（默认255） */</span><br><span class="line">    int maxLength() default 255;</span><br><span class="line"> </span><br><span class="line">    /** 导入唯一性验证（多个字段则取联合验证） */</span><br><span class="line">    boolean unique() default false;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ExcelExport</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">package com.zyq.util.excel;</span><br><span class="line"> </span><br><span class="line">import java.lang.annotation.ElementType;</span><br><span class="line">import java.lang.annotation.Retention;</span><br><span class="line">import java.lang.annotation.RetentionPolicy;</span><br><span class="line">import java.lang.annotation.Target;</span><br><span class="line"> </span><br><span class="line">/**</span><br><span class="line"> * @author sunnyzyq</span><br><span class="line"> * @date 2021/12/17</span><br><span class="line"> */</span><br><span class="line">@Target(ElementType.FIELD)</span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">public @interface ExcelExport &#123;</span><br><span class="line"> </span><br><span class="line">    /** 字段名称 */</span><br><span class="line">    String value();</span><br><span class="line"> </span><br><span class="line">    /** 导出排序先后: 数字越小越靠前（默认按Java类字段顺序导出） */</span><br><span class="line">    int sort() default 0;</span><br><span class="line"> </span><br><span class="line">    /** 导出映射，格式如：0-未知;1-男;2-女 */</span><br><span class="line">    String kv() default &quot;&quot;;</span><br><span class="line"> </span><br><span class="line">    /** 导出模板示例值（有值的话，直接取该值，不做映射） */</span><br><span class="line">    String example() default &quot;&quot;;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ExcelClassField</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">package com.zyq.util.excel;</span><br><span class="line"> </span><br><span class="line">import java.util.LinkedHashMap;</span><br><span class="line"> </span><br><span class="line">/**</span><br><span class="line"> * @author sunnyzyq</span><br><span class="line"> * @date 2021/12/17</span><br><span class="line"> */</span><br><span class="line">public class ExcelClassField &#123;</span><br><span class="line"> </span><br><span class="line">    /** 字段名称 */</span><br><span class="line">    private String fieldName;</span><br><span class="line"> </span><br><span class="line">    /** 表头名称 */</span><br><span class="line">    private String name;</span><br><span class="line"> </span><br><span class="line">    /** 映射关系 */</span><br><span class="line">    private LinkedHashMap&lt;String, String&gt; kvMap;</span><br><span class="line"> </span><br><span class="line">    /** 示例值 */</span><br><span class="line">    private Object example;</span><br><span class="line"> </span><br><span class="line">    /** 排序 */</span><br><span class="line">    private int sort;</span><br><span class="line"> </span><br><span class="line">    /** 是否为注解字段：0-否，1-是 */</span><br><span class="line">    private int hasAnnotation;</span><br><span class="line"> </span><br><span class="line">    public String getFieldName() &#123;</span><br><span class="line">        return fieldName;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public void setFieldName(String fieldName) &#123;</span><br><span class="line">        this.fieldName = fieldName;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public String getName() &#123;</span><br><span class="line">        return name;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public void setName(String name) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public LinkedHashMap&lt;String, String&gt; getKvMap() &#123;</span><br><span class="line">        return kvMap;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public void setKvMap(LinkedHashMap&lt;String, String&gt; kvMap) &#123;</span><br><span class="line">        this.kvMap = kvMap;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public Object getExample() &#123;</span><br><span class="line">        return example;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public void setExample(Object example) &#123;</span><br><span class="line">        this.example = example;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public int getSort() &#123;</span><br><span class="line">        return sort;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public void setSort(int sort) &#123;</span><br><span class="line">        this.sort = sort;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public int getHasAnnotation() &#123;</span><br><span class="line">        return hasAnnotation;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public void setHasAnnotation(int hasAnnotation) &#123;</span><br><span class="line">        this.hasAnnotation = hasAnnotation;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3更新优化"><a class="markdownIt-Anchor" href="#3更新优化"></a> 3.更新优化</h2>
+<h3 id="31优化身份证导出显示为科学计数法的问题"><a class="markdownIt-Anchor" href="#31优化身份证导出显示为科学计数法的问题"></a> 3.1优化身份证导出显示为科学计数法的问题</h3>
+<p>优化前：身份证号码显示为科学计数法。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-46-48.png"
+                        alt="" 
+                 ></p>
+<p>优化后：身份证号码正常显示。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-47-09.png"
+                        alt="" 
+                 ></p>
+<h2 id="4疑问解答"><a class="markdownIt-Anchor" href="#4疑问解答"></a> 4.疑问解答</h2>
+<h3 id="41关于身份证导入显示科学计数法的问题"><a class="markdownIt-Anchor" href="#41关于身份证导入显示科学计数法的问题"></a> 4.1关于身份证导入显示科学计数法的问题</h3>
+<p>首先，当我们把身份证输入到表格中的时候，表格会默认为数字类型，由于数字太大，这时候Excel会自动显示为科学技术法。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-49-18.png"
+                        alt="" 
+                 ></p>
+<p>那么这个时候，我们进行导入的话，确实会显示为科学计数法，如图所示：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-50-04.png"
+                        alt="" 
+                 ></p>
+<p>那么，如果解决这个问题，需要从根源解决掉，即让Excel表格不能显示科学计数法。</p>
+<p>这个时候，我们需要将该列设置为文本格式：</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-51-27.png"
+                        alt="" 
+                 ></p>
+<p>然后设置为文本格式。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-51-47.png"
+                        alt="" 
+                 ></p>
+<p>当设置完成后，你再重新输入身份证后，就会原封不动的显示了。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-52-28.png"
+                        alt="" 
+                 ></p>
+<p>这个时候，你再导入就会完全显示了。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://wws-personal-note.oss-cn-beijing.aliyuncs.com/assets/Snipaste_2023-08-02_14-52-53.png"
+                        alt="" 
+                 ></p>
 ]]></content>
   </entry>
   <entry>
